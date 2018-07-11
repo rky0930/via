@@ -1,11 +1,16 @@
 # VIA Annotation tool
 > VGG Image Annotator (VIA) is an image annotation tool that can be used to define regions in an image.
 
+VIA는 이미지 어노테이션 도구입니다. 오리지날 버젼은 이 링크와 같습니다. 
+저는 이 버젼에서 region attribute를 더 쉽게 선택가능하도록 interface를 추가 하였습니다. 
+많은 사용 부탁드립니다. 불편하 사항이 있으면 issue report 부탁드립니다. 
+
+(Screen Capture)
 ![](via_tesla.png)
 
 ## Installation
 Google Chrome
-All source code based on Javascript & HTML. 
+(All source code based on Javascript & HTML)
 
 ## Usage example
 
@@ -18,8 +23,7 @@ _For more examples and usage, please refer to the [Wiki][wiki]._
 Describe how to install all development dependencies and how to run an automated test-suite of some kind. Potentially do this for multiple platforms.
 
 ```sh
-make install
-npm test
+sh pack_via.sh
 ```
 
 ## Release History
