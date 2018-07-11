@@ -578,7 +578,18 @@
 
         <button onclick="toggle_reg_attr_panel()" class="leftsidebar_accordion" id="reg_attr_panel_button">Region Attributes</button>
         <button onclick="toggle_file_attr_panel()" class="leftsidebar_accordion" id="file_attr_panel_button">File Attributes</button>
-
+        <button onclick="show_default_attribute(this)" class="leftsidebar_accordion">Default Attribute</button>        
+          <div class="leftsidebar_accordion_panel">
+            <select id="DefaultAttributeExampleSelectBox" onchange="default_attribute_example_selectbox_change()">
+              <option value="none">-- select an option --
+              <option value="mscoco">MS-COCO
+              <option value="kitti">KITTI
+              <option value="pascal">PASCAL VOC
+              <option value="pet">Oxford-IIIT Pet
+            </select>
+            <textarea id="DefaultAttributeTextArea" rows="20" style="width: 95%;" onchange="default_attribute_textarea_change()" placeholder='ex: &#13;&#10;{&#13;&#10; "id": [ &#13;&#10;    "person",&#13;&#10;    "bicycle",&#13;&#10;    "car",&#13;&#10;    "motorcycle",&#13;&#10;    "airplane",&#13;&#10;    "train"&#13;&#10; ]&#13;&#10;}'></textarea>
+            <button type="button" onclick="set_default_attribute()">Set</button>
+          </div>
         <button onclick="toggle_accordion_panel(this)" class="leftsidebar_accordion">Keyboard Shortcuts</button>
         <div class="leftsidebar_accordion_panel">
           <table style="padding: 2em 0em;">
@@ -797,7 +808,7 @@ var VIA_CSV_KEYVAL_SEP = ':';
 var VIA_IMPORT_CSV_COMMENT_CHAR = '#';
 
 var _via_img_metadata = {};   // data structure to store loaded images metadata
-var _via_default_attribute = {};   // data structure to store loaded images metadata
+var _via_default_attribute = "";   // data structure to store loaded images metadata
 var _via_img_count    = 0;    // count of the loaded images
 var _via_canvas_regions = []; // image regions spec. in canvas space
 var _via_canvas_scale   = 1.0;// current scale of canvas image
@@ -863,6 +874,7 @@ var _via_current_update_attribute_name = "";
 var _via_current_update_region_id      = -1;
 var _via_file_attributes               = new Set();
 var _via_visible_attr_name             = '';
+var _via_default_attribute_number      = 0;
 
 // persistence to local storage
 var _via_is_local_storage_available = false;
@@ -977,19 +989,23 @@ function download_all_region_data(type) {
 }
 
 function sel_local_data_file(type) {
-  if (invisible_file_input) {
-    invisible_file_input.accept='.csv,.json';
-    switch(type) {
-    case 'annotations':
-      invisible_file_input.onchange = import_annotations_from_file;
-      break;
-    case 'attributes':
-      invisible_file_input.onchange = import_attributes_from_file;
-      break;
-    default:
-      return;
+  if (_via_default_attribute == "") {
+    show_message('Please Set Default Attribute')
+  }else{
+    if (invisible_file_input) {
+      invisible_file_input.accept='.csv,.json';
+      switch(type) {
+      case 'annotations':
+        invisible_file_input.onchange = import_annotations_from_file;
+        break;
+      case 'attributes':
+        invisible_file_input.onchange = import_attributes_from_file;
+        break;
+      default:
+        return;
+      }
+      invisible_file_input.click();
     }
-    invisible_file_input.click();
   }
 }
 function import_attributes() {
@@ -3716,57 +3732,64 @@ window.addEventListener('keydown', function(e) {
 
     return;
   }
-
+  var dummyEl = document.getElementById('DefaultAttributeTextArea');
+  var isFocused = (document.activeElement === dummyEl);
   // user commands
-  if ( e.ctrlKey ) {
-    _via_is_ctrl_pressed = true;
-    if ( e.which === 83 ) { // Ctrl + s
-      download_all_region_data('json');
-      e.preventDefault();
-      return;
-    }
-
-    if ( e.which === 65 ) { // Ctrl + a
-      sel_all_regions();
-      e.preventDefault();
-      return;
-    }
-
-    if ( e.which === 67 ) { // Ctrl + c
-      if (_via_is_region_selected ||
-          _via_is_all_region_selected) {
-        copy_sel_regions();
+  if(isFocused){
+    //DefaultAttributeTextArea has focus
+  }
+  else{
+    if ( e.ctrlKey ) {
+      _via_is_ctrl_pressed = true;
+      if ( e.which === 83 ) { // Ctrl + s
+        download_all_region_data('json');
         e.preventDefault();
+        return;
       }
-      return;
+
+      if ( e.which === 65 ) { // Ctrl + a
+        sel_all_regions();
+        e.preventDefault();
+        return;
+      }
+
+      if ( e.which === 67 ) { // Ctrl + c
+        if (_via_is_region_selected ||
+            _via_is_all_region_selected) {
+          copy_sel_regions();
+          e.preventDefault();
+        }
+        return;
+      }
+
+      if ( e.which === 86 ) { // Ctrl + v
+        paste_sel_regions();
+        e.preventDefault();
+        return;
+      }
     }
 
-    if ( e.which === 86 ) { // Ctrl + v
-      paste_sel_regions();
+    //no focus for input and textarea
+    if( e.which === 46 || e.which === 8) { // Del or Backspace
+      del_sel_regions();
+      e.preventDefault();
+    }
+    if (e.which === 78 || e.which === 39) { // n or right arrow
+      move_to_next_image();
       e.preventDefault();
       return;
     }
-  }
-
-  if( e.which === 46 || e.which === 8) { // Del or Backspace
-    del_sel_regions();
-    e.preventDefault();
-  }
-  if (e.which === 78 || e.which === 39) { // n or right arrow
-    move_to_next_image();
-    e.preventDefault();
-    return;
-  }
-  if (e.which === 80 || e.which === 37) { // n or right arrow
-    move_to_prev_image();
-    e.preventDefault();
-    return;
-  }
-  if (e.which === 32 && _via_current_image_loaded) { // Space
-    toggle_img_list();
-    e.preventDefault();
-    return;
-  }
+    if (e.which === 80 || e.which === 37) { // n or right arrow
+      move_to_prev_image();
+      e.preventDefault();
+      return;
+    }
+    if (e.which === 32 && _via_current_image_loaded) { // Space
+      toggle_img_list();
+      e.preventDefault();
+      return;
+    }
+  }    
 
   // zoom
   if (_via_current_image_loaded) {
@@ -4547,8 +4570,11 @@ function add_new_attribute(type, attribute_name) {
 // Yoon Added functions
 function init_default_attribute() {
   
-  _via_default_attribute = //<!--AUTO_INSERT_VIA_DEFAULT_ATTRIBUTE-->
-{ "id":  ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush'] }
+  TextAreaValue = document.getElementById("DefaultAttributeTextArea").value
+  if (TextAreaValue != "") {
+    _via_default_attribute = JSON.parse(TextAreaValue)
+  }
+
   for (var attr in _via_default_attribute) {
     if (_via_default_attribute.hasOwnProperty(attr)) {
         add_new_attribute('r', attr);
@@ -4601,7 +4627,7 @@ function create_default_attribute_select_box(type, region_id) {
     ' >' + html_attribute_and_value + '</div> ';
   
   document.getElementById("region_canvas").insertAdjacentHTML('afterend', html_select_box);
-    
+  _via_default_attribute_number++
 }
 
 function clear_default_attribute_select_box_all() {
@@ -4713,6 +4739,107 @@ function hide_default_attribute_select_box() {
   }
 }
 
+function show_default_attribute(e) {
+  e.classList.toggle('active');
+  e.nextElementSibling.classList.toggle('show');
+  if (_via_default_attribute != ""){ 
+    document.getElementById('DefaultAttributeTextArea').value = JSON.stringify(_via_default_attribute, undefined, 2);  
+  }
+}
+
+function recreate_default_attribute_select_box() {
+  default_attribute_select_boxs = document.getElementsByClassName("default_attribute_select_box")
+  for (var i=0, box; box =  default_attribute_select_boxs[i]; i++) {
+    box_id = box.getAttribute('id');
+    type_and_region_id = box_id.split("#");
+    box.remove();
+    type = type_and_region_id[1]
+    region_id = type_and_region_id[2]
+    create_default_attribute_select_box(type, region_id)
+  }
+  // update default attribute select box
+  if (default_attribute_select_boxs.length > 0) {
+    update_default_attribute_select_box()
+  }
+}
+
+function set_default_attribute() {
+  default_attribute_text = document.getElementById('DefaultAttributeTextArea').value
+  if (default_attribute_text == "") {
+    _via_default_attribute = {}
+  } else {
+    _via_default_attribute = JSON.parse(default_attribute_text)
+    // Format text to Json 
+    document.getElementById('DefaultAttributeTextArea').value = JSON.stringify(_via_default_attribute, undefined, 2);
+  } 
+  recreate_default_attribute_select_box()
+}
+
+function default_attribute_textarea_change() {
+  var DefaultAttributeExampleSelectBox = document.getElementById('DefaultAttributeExampleSelectBox')
+  if (DefaultAttributeExampleSelectBox.value != 'none') {
+    DefaultAttributeExampleSelectBox.selectedIndex = 0;
+  } 
+}
+
+function default_attribute_example_selectbox_change() {
+  var selected_value = document.getElementById('DefaultAttributeExampleSelectBox').value
+  if (selected_value == 'none') {
+    document.getElementById('DefaultAttributeTextArea').value = ""
+  } else {
+    if (selected_value == 'mscoco') {
+      _via_default_attribute = { 
+        "display_name":  
+        ["person", "bicycle", "car", "motorcycle", 
+        "airplane", "bus", "train", "truck", "boat", 
+        "traffic light", "fire hydrant", "stop sign", 
+        "parking meter", "bench", "bird", "cat", "dog", 
+        "horse", "sheep", "cow", "elephant", "bear", "zebra", 
+        "giraffe", "backpack", "umbrella", "handbag", "tie", 
+        "suitcase", "frisbee", "skis", "snowboard", "sports ball", 
+        "kite", "baseball bat", "baseball glove", "skateboard", 
+        "surfboard", "tennis racket", "bottle", "wine glass", 
+        "cup", "fork", "knife", "spoon", "bowl", "banana", 
+        "apple", "sandwich", "orange", "broccoli", "carrot", 
+        "hot dog", "pizza", "donut", "cake", "chair", "couch", 
+        "potted plant", "bed", "dining table", "toilet", "tv", 
+        "laptop", "mouse", "remote", "keyboard", "cell phone", 
+        "microwave", "oven", "toaster", "sink", "refrigerator", 
+        "book", "clock", "vase", "scissors", "teddy bear",
+        "hair drier", "toothbrush"] 
+      } 
+    } else if (selected_value == 'kitti') {
+      _via_default_attribute = { 
+        "name": ["car", "pedestrian"] 
+      }
+    } else if (selected_value == 'pascal') {
+      _via_default_attribute = { 
+        "display_name":  
+        ["aeroplane", "bicycle", "bird", "boat", 
+         "bottle", "bus", "car", "cat", "chair", 
+         "cow", "diningtable", "dog", "horse", 
+         "motorbike", "person", "pottedplant", 
+         "sheep", "sofa", "train", "tvmonitor"] 
+      } 
+    } else if (selected_value == 'pet') {
+      _via_default_attribute = { 
+        "name":  
+        ["Abyssinian", "american_bulldog", "american_pit_bull_terrier", 
+        "basset_hound", "beagle", "Bengal", "Birman", "Bombay", 
+        "boxer", "British_Shorthair", "chihuahua", "Egyptian_Mau", 
+        "english_cocker_spaniel", "english_setter", "german_shorthaired", 
+        "great_pyrenees", "havanese", "japanese_chin", "keeshond", 
+        "leonberger", "Maine_Coon", "miniature_pinscher", "newfoundland", 
+        "Persian", "pomeranian", "pug", "Ragdoll", "Russian_Blue", 
+        "saint_bernard", "samoyed", "scottish_terrier", "shiba_inu", 
+        "Siamese", "Sphynx", "staffordshire_bull_terrier", "wheaten_terrier", 
+        "yorkshire_ter"] 
+      } 
+    }
+    document.getElementById('DefaultAttributeTextArea').value = JSON.stringify(_via_default_attribute, undefined, 2); 
+    set_default_attribute()
+  }
+}
 //
 // hooks for sub-modules
 // implemented by sub-modules
@@ -4734,5 +4861,6 @@ function hide_default_attribute_select_box() {
     <script src="./tests/via_test_fileio.js"></script>
     <script src="./tests/via_test_region.js"></script>
      -->
-  </body>
+
+    </body>
 </html>

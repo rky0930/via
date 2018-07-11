@@ -578,7 +578,18 @@
 
         <button onclick="toggle_reg_attr_panel()" class="leftsidebar_accordion" id="reg_attr_panel_button">Region Attributes</button>
         <button onclick="toggle_file_attr_panel()" class="leftsidebar_accordion" id="file_attr_panel_button">File Attributes</button>
-
+        <button onclick="show_default_attribute(this)" class="leftsidebar_accordion">Default Attribute</button>        
+          <div class="leftsidebar_accordion_panel">
+            <select id="DefaultAttributeExampleSelectBox" onchange="default_attribute_example_selectbox_change()">
+              <option value="none">-- select an option --
+              <option value="mscoco">MS-COCO
+              <option value="kitti">KITTI
+              <option value="pascal">PASCAL VOC
+              <option value="pet">Oxford-IIIT Pet
+            </select>
+            <textarea id="DefaultAttributeTextArea" rows="20" style="width: 95%;" onchange="default_attribute_textarea_change()" placeholder='ex: &#13;&#10;{&#13;&#10; "id": [ &#13;&#10;    "person",&#13;&#10;    "bicycle",&#13;&#10;    "car",&#13;&#10;    "motorcycle",&#13;&#10;    "airplane",&#13;&#10;    "train"&#13;&#10; ]&#13;&#10;}'></textarea>
+            <button type="button" onclick="set_default_attribute()">Set</button>
+          </div>
         <button onclick="toggle_accordion_panel(this)" class="leftsidebar_accordion">Keyboard Shortcuts</button>
         <div class="leftsidebar_accordion_panel">
           <table style="padding: 2em 0em;">
@@ -735,21 +746,5 @@
     </script>
     <script type="text/javascript">
       //<!--AUTO_INSERT_VIA_JS_HERE-->
-    </script>
-
-    <!--
-    <script src="via.js"></script>
-    -->
-    <!--
-    <script src="via_demo.js"></script>
-    -->
-
-    <!-- Unit Tests    -->
-    <!--
-    <script src="./tests/via_test_data.js"></script>
-    <script src="./tests/via_test.js"></script>
-    <script src="./tests/via_test_fileio.js"></script>
-    <script src="./tests/via_test_region.js"></script>
-     -->
-  </body>
+    </body>
 </html>
