@@ -2,7 +2,7 @@
 [VGG Image Annotator (VIA)](http://www.robots.ox.ac.uk/~vgg/software/via/)is Image annotation tool.  
 Original repo is [here](https://gitlab.com/vgg/via/tags/via-1.0.4).  
 
-## New features
+## New features in this version
 1. Default Attribute select pop-up box  
 2. Default Attribute setup text area  
 3. Python script to make VIA annotation file to tfrecord  
