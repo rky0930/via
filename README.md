@@ -1,29 +1,37 @@
 # VIA Annotation tool
-[VGG Image Annotator (VIA)](http://www.robots.ox.ac.uk/~vgg/software/via/)는 Image annotation tool입니다.  
-Original repo는 이 [링크](https://gitlab.com/vgg/via/tags/via-1.0.4)와 같습니다.  
+[VGG Image Annotator (VIA)](http://www.robots.ox.ac.uk/~vgg/software/via/)is Image annotation tool.  
+Original repo is [here](https://gitlab.com/vgg/via/tags/via-1.0.4).  
 
-## New feature
-Region을 선택하면 Select box가 생성되어 더 효율적인 Annotation 작업이 가능하게 합니다.  
-VIA를 통해 생성된 annotation file을 tfrecord 형태로 생성하는 방법은 [링크]() 에서 확인하실 수 있습니다.  
-
-![](via_tesla.png)
+## New features
+1. Default Attribute select pop-up box  
+2. Default Attribute setup text area  
+3. Python script to make VIA annotation file to tfrecord  
+4. Python script to make tfrecord to VIA annotation file  
+  
+![](via_tesla.png)  
 
 ## Installation
-크롬 브라우져 (*별도 설치 필요없음)  
-(모든 소스코드는 Javascript & HTML로 되어있습니다.)  
-(All source code based on Javascript & HTML)
+1. Web Browser (All source code based on JS & HTML)  
+2. (Optional) Python *Only if you want to create tfrecord  
 
 ## Usage example
-Object Detection 관련 데이터셋을 만들때 사용.  
+1. Open via/via.html using web browser
+2. Load Images 
+3. Set default attribute
+4. (If you have annotation file) Import Annotation file
+5. Marking object(Bounding box, polygon, Etc)
+6. Save Annotation file
+7. (If you use tfrecord) Make tfrecord 
 
 ## Development setup
-HTML 수정 -> index.html  
-Javascript -> via.js  
-두 파일 통합  
+1. Dowdload Source code.  
+2. (If you want to modify HTML) Modify index.html  
+3. (If you want to modify JS) Modify via.js  
+4. Mergeing index.html and via.js into target file
 ```sh
 sh pack_via.sh
 ```
-최종 파일: via.html
+5. target file is via.html
 
 ## Author
 Gyoung-yoon Ryoo – [rky0930@gmail.com]
