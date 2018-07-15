@@ -6,7 +6,6 @@ Original repo는 이 [링크](https://gitlab.com/vgg/via/tags/via-1.0.4)와 같�
 Region을 선택하면 Select box가 생성되어 더 효율적인 Annotation 작업이 가능하게 합니다.  
 VIA를 통해 생성된 annotation file을 tfrecord 형태로 생성하는 방법은 [링크]() 에서 확인하실 수 있습니다.  
 
-(Screen Capture)
 ![](via_tesla.png)
 
 ## Installation
@@ -42,4 +41,5 @@ BSD-2 clause license.
 5. Create a new Pull Request
 
 ## Issue report 
-불편한 사항이 있으면 issue report 부탁드립니다. 
+1. Report via [issues page](https://github.com/rky0930/via/issues) in this repos. 
+   
