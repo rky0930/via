@@ -1,28 +1,3 @@
-# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-
-r"""Convert raw PASCAL dataset to TFRecord for object_detection.
-
-Example usage:
-python via_json_create_tf_record.py --image_dir=tmp/JPEGImages \
-  --annotation_file=tmp/via_region_data_coco.json \
-  --label_map_file=$HOME/workspace/git_rky0930/models/research/object_detection/data/mscoco_label_map.pbtxt \
-  --output=tmp/coco_overfit.record \
-  --t_v_ratio=1
-
-"""
 # -*- coding: utf-8 -*-
 
 from __future__ import absolute_import
@@ -42,18 +17,16 @@ import numpy as np
 import PIL.Image
 import tensorflow as tf
 
-from object_detection.utils import dataset_util
-from object_detection.utils import label_map_util
+from utils import dataset_util
+from utils import label_map_util
 
 flags = tf.app.flags
-flags.DEFINE_string('image_dir', 'JPEGImages', 'Image directory for raw dataset.')
-flags.DEFINE_string('annotation_file', 'via_region_data.json', 'Annotation file for raw dataset.')
-flags.DEFINE_string('output', 'output', 'Path to output TFRecord ex) tmp: output file = tmp_t, tmp_v')
-flags.DEFINE_float('t_v_ratio', '0.9', 'Training & Validation set ratio. ex) 0.9 => training:validation = 9:1')
-flags.DEFINE_string('label_map_file', 'label_map.pbtxt',
-                    'Path to label map proto')
-flags.DEFINE_boolean('use_display_name', False, 'whether to use the label map items\' display names as keys.')
-flags.DEFINE_string('region_attributes_key', 'id', 'Key value of region_attribute for annotation file.')
+flags.DEFINE_string('image_dir', 'JPEGImages', 'Image directory for raw dataset')
+flags.DEFINE_string('annotation_file', 'via_region_data.json', 'Annotation file for raw dataset')
+flags.DEFINE_string('output', 'output', 'Path to output TFRecord ex) tmp: output file = tmp_train, tmp_val')
+flags.DEFINE_float('train_val_ratio', '1.0', 'Training & Validation set ratio. ex) 0.9 => training:validation = 9:1')
+flags.DEFINE_string('label_map_file', 'label_map.pbtxt', 'Path to label map proto')
+flags.DEFINE_string('category_name', 'display_name', 'Category name in annotation file. ex) display_name, name')
 FLAGS = flags.FLAGS
 
 def dict_to_tf_example(data,
@@ -65,9 +38,8 @@ def dict_to_tf_example(data,
   by the raw data.
 
   Args:
-    data: dict holding PASCAL XML fields for a single image (obtained by
-      running dataset_util.recursive_parse_xml_to_dict)
-    image_dir: Path to root directory holding PASCAL dataset
+    data: Annoation data of single image
+    image_dir: Path to root directory holding images
     label_map_dict: A map from string label names to integers ids.
     ignore_difficult_instances: Whether to skip difficult instances in the
       dataset  (default: False).
@@ -101,7 +73,7 @@ def dict_to_tf_example(data,
   classes = []
   classes_text = []
   
-  for region_id, attribute in data['regions'].iteritems():
+  for _, attribute in data['regions'].iteritems():
 
     shape = attribute['shape_attributes']
     region_x = shape['x']
@@ -115,9 +87,9 @@ def dict_to_tf_example(data,
     ymax.append(region_ymax / image_height)
 
     region_attributes = attribute['region_attributes']
-    r_key = FLAGS.region_attributes_key
-    classes_text.append(region_attributes[r_key].encode('utf8'))
-    classes.append(label_map_dict[region_attributes[r_key]])
+    category_name = FLAGS.category_name
+    classes_text.append(region_attributes[category_name].encode('utf8'))
+    classes.append(label_map_dict[region_attributes[category_name]])
   
   example = tf.train.Example(features=tf.train.Features(feature={
       'image/height': dataset_util.int64_feature(image_height),
@@ -156,16 +128,17 @@ def main(_):
     annotation_keys = annotations.keys()
     np.random.shuffle(annotation_keys)
 
-    # Train:Validation (T:V)
-    training_size = int(annotation_size * FLAGS.t_v_ratio)
+    # Train:Validation
+    training_size = int(annotation_size * FLAGS.train_val_ratio)
     training_data    = annotation_keys[:training_size]
     validataion_data = annotation_keys[training_size:]
 
-    label_map_dict = label_map_util.get_label_map_dict(FLAGS.label_map_file, use_display_name=FLAGS.use_display_name) 
+    use_display_name = True if FLAGS.category_name == 'display_name' else False
+    label_map_dict = label_map_util.get_label_map_dict(FLAGS.label_map_file, use_display_name=use_display_name) 
           
     dataset = [
-      ('_t', training_data),
-      ('_v', validataion_data),
+      ('_train', training_data),
+      ('_val', validataion_data),
     ]
 
     for suffix, data_list in dataset:
@@ -173,7 +146,6 @@ def main(_):
         continue
 
       output = os.path.join(output_dir, output_name + suffix + output_ext)
-      print(output)
       with tf.python_io.TFRecordWriter(output) as writer:
         for idx, key in enumerate(data_list):
 
@@ -183,6 +155,6 @@ def main(_):
             
           tf_example = dict_to_tf_example(annotations[key], image_dir, label_map_dict)
           writer.write(tf_example.SerializeToString())
-
+    print("Success. ")
 if __name__ == '__main__':
   tf.app.run()
