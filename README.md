@@ -1,66 +1,45 @@
 # VIA Annotation tool
-> VGG Image Annotator (VIA) is an image annotation tool that can be used to define regions in an image.
+[VGG Image Annotator (VIA)](http://www.robots.ox.ac.uk/~vgg/software/via/)는 Image annotation tool입니다.  
+Original repo는 이 [링크](https://gitlab.com/vgg/via/tags/via-1.0.4)와 같습니다.  
 
-VIA는 이미지 어노테이션 도구입니다. 오리지날 버젼은 이 링크와 같습니다. 
-저는 이 버젼에서 region attribute를 더 쉽게 선택가능하도록 interface를 추가 하였습니다. 
-많은 사용 부탁드립니다. 불편하 사항이 있으면 issue report 부탁드립니다. 
+## New feature
+Region을 선택하면 Select box가 생성되어 더 효율적인 Annotation 작업이 가능하게 합니다.  
+VIA를 통해 생성된 annotation file을 tfrecord 형태로 생성하는 방법은 [링크]() 에서 확인하실 수 있습니다.  
 
 (Screen Capture)
 ![](via_tesla.png)
 
 ## Installation
-Google Chrome
+크롬 브라우져 (*별도 설치 필요없음)  
+(모든 소스코드는 Javascript & HTML로 되어있습니다.)  
 (All source code based on Javascript & HTML)
 
 ## Usage example
-
-A few motivating and useful examples of how your product can be used. Spice this up with code blocks and potentially more screenshots.
-
-_For more examples and usage, please refer to the [Wiki][wiki]._
+Object Detection 관련 데이터셋을 만들때 사용.  
 
 ## Development setup
-
-Describe how to install all development dependencies and how to run an automated test-suite of some kind. Potentially do this for multiple platforms.
-
+HTML 수정 -> index.html  
+Javascript -> via.js  
+두 파일 통합  
 ```sh
 sh pack_via.sh
 ```
+최종 파일: via.html
 
-## Release History
+## Author
+Gyoung-yoon Ryoo – [rky0930@gmail.com]
 
-* 0.2.1
-    * CHANGE: Update docs (module code remains unchanged)
-* 0.2.0
-    * CHANGE: Remove `setDefaultXYZ()`
-    * ADD: Add `init()`
-* 0.1.1
-    * FIX: Crash when calling `baz()` (Thanks @GenerousContributorName!)
-* 0.1.0
-    * The first proper release
-    * CHANGE: Rename `foo()` to `bar()`
-* 0.0.1
-    * Work in progress
-
-## Meta
-
-Your Name – [@YourTwitter](https://twitter.com/dbader_org) – YourEmail@example.com
-
-Distributed under the XYZ license. See ``LICENSE`` for more information.
-
-[https://github.com/yourname/github-link](https://github.com/dbader/)
+## License
+VIA is an open source project released under the 
+BSD-2 clause license.
 
 ## Contributing
 
-1. Fork it (<https://github.com/yourname/yourproject/fork>)
+1. Fork it (<https://github.com/rky093/via/fork>)
 2. Create your feature branch (`git checkout -b feature/fooBar`)
 3. Commit your changes (`git commit -am 'Add some fooBar'`)
 4. Push to the branch (`git push origin feature/fooBar`)
 5. Create a new Pull Request
 
-<!-- Markdown link & img dfn's -->
-[npm-image]: https://img.shields.io/npm/v/datadog-metrics.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/datadog-metrics
-[npm-downloads]: https://img.shields.io/npm/dm/datadog-metrics.svg?style=flat-square
-[travis-image]: https://img.shields.io/travis/dbader/node-datadog-metrics/master.svg?style=flat-square
-[travis-url]: https://travis-ci.org/dbader/node-datadog-metrics
-[wiki]: https://github.com/yourname/yourproject/wiki
+## Issue report 
+불편한 사항이 있으면 issue report 부탁드립니다. 
