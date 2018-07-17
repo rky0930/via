@@ -104,10 +104,10 @@ def read_tfrecords(tfrecord_file, label_map, max_read, ):
       doc[image_id]['regions'][region_id] = {
         "shape_attributes": {
         'name': FLAGS.region_shape,
-        'y': ymin * img_height,
-        'x': xmin * img_width,
-        'height': height * img_height,
-        'width': width * img_width,
+        'y': int(round(ymin * img_height)),
+        'x': int(round(xmin * img_width)),
+        'height': int(round(height * img_height)),
+        'width': int(round(width * img_width)),
         },
         "region_attributes": {
           FLAGS.category_name : label_map[label]
