@@ -73,24 +73,27 @@ def dict_to_tf_example(data,
   classes = []
   classes_text = []
   
-  for _, attribute in data['regions'].iteritems():
+  for region_id, attribute in data['regions'].iteritems():
+    try:
+      shape = attribute['shape_attributes']
+      region_x = shape['x']
+      region_y = shape['y']
+      region_xmax = region_x + shape['width']
+      region_ymax = region_y + shape['height']
+    
+      xmin.append(region_x / image_width)
+      ymin.append(region_y / image_height)
+      xmax.append(region_xmax / image_width)
+      ymax.append(region_ymax / image_height)
 
-    shape = attribute['shape_attributes']
-    region_x = shape['x']
-    region_y = shape['y']
-    region_xmax = region_x + shape['width']
-    region_ymax = region_y + shape['height']
-  
-    xmin.append(region_x / image_width)
-    ymin.append(region_y / image_height)
-    xmax.append(region_xmax / image_width)
-    ymax.append(region_ymax / image_height)
-
-    region_attributes = attribute['region_attributes']
-    category_name = FLAGS.category_name
-    classes_text.append(region_attributes[category_name].encode('utf8'))
-    classes.append(label_map_dict[region_attributes[category_name]])
-  
+      region_attributes = attribute['region_attributes']  
+      category_name = FLAGS.category_name
+      classes_text.append(region_attributes[category_name])
+      classes.append(label_map_dict[region_attributes[category_name]])
+    except KeyError as e:
+      if len(attribute['region_attributes']) == 0: 
+        print("No categery(image: %s, region: %s)" % (filename, region_id))
+    
   example = tf.train.Example(features=tf.train.Features(feature={
       'image/height': dataset_util.int64_feature(image_height),
       'image/width': dataset_util.int64_feature(image_width),
@@ -121,7 +124,7 @@ def main(_):
 
   with open(annotation_path) as annotation_fid:
 
-    annotations     = json.load(annotation_fid)
+    annotations     = yaml.safe_load(annotation_fid)
     annotation_size = len(annotations)
     
     # Shuffle
@@ -152,7 +155,7 @@ def main(_):
           # Print Status
           if idx % 100 == 0:
             print('On image %d of %d'% (idx, training_size))
-            
+
           tf_example = dict_to_tf_example(annotations[key], image_dir, label_map_dict)
           writer.write(tf_example.SerializeToString())
     print("Success. ")
