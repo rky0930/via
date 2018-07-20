@@ -88,11 +88,13 @@ def dict_to_tf_example(data,
 
       region_attributes = attribute['region_attributes']  
       category_name = FLAGS.category_name
-      classes_text.append(region_attributes[category_name])
-      classes.append(label_map_dict[region_attributes[category_name]])
+      #classes_text.append(region_attributes[category_name])
+      classes.append(label_map_dict[region_attributes[category_name].encode('utf8')])
     except KeyError as e:
       if len(attribute['region_attributes']) == 0: 
         print("No categery(image: %s, region: %s)" % (filename, region_id))
+      else: 
+        print(e)
     
   example = tf.train.Example(features=tf.train.Features(feature={
       'image/height': dataset_util.int64_feature(image_height),
@@ -106,7 +108,7 @@ def dict_to_tf_example(data,
       'image/object/bbox/xmax': dataset_util.float_list_feature(xmax),
       'image/object/bbox/ymin': dataset_util.float_list_feature(ymin),
       'image/object/bbox/ymax': dataset_util.float_list_feature(ymax),
-      'image/object/class/text': dataset_util.bytes_list_feature(classes_text),
+      #'image/object/class/text': dataset_util.bytes_list_feature(classes_text),
       'image/object/class/label': dataset_util.int64_list_feature(classes),
   }))
   return example
