@@ -1,10 +1,17 @@
+# Notice 
+The on-image annotation editor feature is added to original VIA since VIA 2.0.2 version.   
+([based on my contribution](https://gitlab.com/vgg/via/blob/master/Contributors.md))  
+If you are use this version of VIA, I'd like to recommand you to use Latest VIA.  
+The python scripts associated with tfrecord are still useful to users of VIA and Tensorflow. 
+
+
 # VIA Annotation tool
 [VGG Image Annotator (VIA)](http://www.robots.ox.ac.uk/~vgg/software/via/)is Image annotation tool.  
 Original repo is [here](https://gitlab.com/vgg/via/tags/via-1.0.4).  
 
 ## New features in this version
-1. Default Attribute select pop-up box  
-2. Default Attribute setup text area  
+1. On-image annotation editor 
+2. Attribute setup text area
 3. Python script to make VIA annotation file to tfrecord  
 4. Python script to make tfrecord to VIA annotation file  
   
