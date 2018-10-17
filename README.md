@@ -1,4 +1,4 @@
-# Notice 
+# Notice
 The on-image annotation editor feature is added to original VIA since VIA 2.0.2 version.   
 ([based on my contribution](https://gitlab.com/vgg/via/blob/master/Contributors.md))  
 If you are use this version of VIA, I'd like to recommand you to use Latest VIA.  
