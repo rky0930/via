@@ -1,7 +1,7 @@
 # Notice
 The on-image annotation editor feature is added to original VIA since VIA 2.0.2 version.   
 ([based on my contribution](https://gitlab.com/vgg/via/blob/master/Contributors.md))  
-If you want to use this version of VIA, I'd like to recommand you to use latest VIA.  
+If you want to use this version of VIA, I'd like to recommand you to use latest original VIA.  
 The python scripts associated with tfrecord are still useful to users of VIA and Tensorflow. 
 
 
